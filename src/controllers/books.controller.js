@@ -55,14 +55,47 @@ export const addBook = async (req, res) => {
 
 // @desc    Get all books
 // @route   GET /api/books
+// export const getAllBooks = async (req, res) => {
+//   try {
+//     const books = await Book.find().sort({ createdAt: -1 });
+//     res.status(200).json(books);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// };
+
 export const getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find().sort({ createdAt: -1 });
-    res.status(200).json(books);
+    let { page = 1, limit = 10 } = req.query; // Get page and limit from query params
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1) limit = 10;
+
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip
+
+    // Fetch books with pagination
+    const books = await Book.find()
+      .sort({ createdAt: -1 }) // Sorting by newest first
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination metadata
+    const totalBooks = await Book.countDocuments();
+
+    res.status(200).json({
+      totalBooks,
+      totalPages: Math.ceil(totalBooks / limit),
+      currentPage: page,
+      books
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // @desc    Search books by title or author
 // @route   GET /api/books/search
