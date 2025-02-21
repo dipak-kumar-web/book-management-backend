@@ -53,16 +53,6 @@ export const addBook = async (req, res) => {
   }
 };
 
-// @desc    Get all books
-// @route   GET /api/books
-// export const getAllBooks = async (req, res) => {
-//   try {
-//     const books = await Book.find().sort({ createdAt: -1 });
-//     res.status(200).json(books);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
 
 export const getAllBooks = async (req, res) => {
   try {
